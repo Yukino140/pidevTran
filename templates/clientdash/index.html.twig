@@ -7,8 +7,11 @@
     {# Run `composer require symfony/webpack-encore-bundle` to start using Symfony UX #}
     {% block stylesheets %}
         <!-- Favicons -->
+
         <link href="{{ asset('assets/img/favicon.png') }}" rel="icon">
         <link href="{{ asset('assets/img/apple-touch-icon.png') }}" rel="apple-touch-icon">
+        <link href="{{ asset('style.css') }}" rel="stylesheet">
+
 
         <!-- Google Fonts -->
         <link href="https://fonts.gstatic.com" rel="preconnect">
@@ -258,6 +261,7 @@
         </nav><!-- End Icons Navigation -->
 
     </header><!-- End Header -->
+
 {% endblock %}
 
 {% block sidebar %}
@@ -292,13 +296,45 @@
             </li><!-- End Forms Nav -->
 
             <li class="nav-item">
+
                 <a class="nav-link collapsed" data-bs-target="#tables-nav" data-bs-toggle="collapse" href="#">
                     <i class="bi bi-layout-text-window-reverse"></i>
-                    <span>Transaction</span>
+                    <span class="link_name">Transaction <i class='bx bxs-chevron-down arrow' ></i></span>
 
                 </a>
 
+
+                <ul  id="tables-nav" class="sub-menu">
+                    <li style="margin-left: 15px;margin-bottom: 10px"><a href="#">
+                            Overview
+                        </a>
+                    </li>
+                    <li style="margin-left: 15px;margin-bottom: 10px">
+                        <a href="{{ path('depo') }}" >
+                            Deposit
+                        </a>
+                    </li>
+                    <li style="margin-left: 15px;margin-bottom: 10px">
+                        <a href="{{ path('trans') }}">
+                            Transfert
+                        </a>
+                    </li>
+                    <li style="margin-left: 15px;margin-bottom: 10px">
+                        <a href="{{ path('retrait') }}">
+                            Withdrawl
+                        </a>
+                    </li>
+                    <li style="margin-left: 15px;margin-bottom: 10px">
+                        <a href="{{ path('getAllT') }}">
+                            Transactions History
+                        </a>
+                    </li>
+
+                </ul>
+
+
             </li><!-- End Tables Nav -->
+
 
             <li class="nav-item">
                 <a class="nav-link collapsed" data-bs-target="#charts-nav" data-bs-toggle="collapse" href="#">

@@ -1,0 +1,59 @@
+{% extends 'clientdash/index.html.twig' %}
+
+{% block body %}
+    <table id="example" class="table table-striped nowrap" style="width:70%;margin-left:25%;margin-top:10%">
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>Transaction Type</th>
+            <th>Account</th>
+            <th>Account Recived</th>
+            <th>Date</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for r in transac %}
+
+
+            <tr>
+                <td>#{{ r.id }}</td>
+                <td>{{ r.typeTransaction.name }}</td>
+                <td>{{ r.idCompte }}</td>
+                <td>{{ r.compteRecus }}</td>
+                <td>{{ r.date|date('d-m-Y') }}</td>
+                <td>{{ r.montant }}</td>
+                <td></td>
+                <td>{% if r.facture==null %}
+                        <div>
+                            <button class="btn btn-success"><a href="{{ path('addF',{id:r.id}) }}" style="color: white;">Create Facture</a></button>
+                        </div>
+                    {% endif %}
+                    {% if r.facture!=null %}
+                        <div>
+                            <button class="btn btn-secondary"><a href="{{ path('showF',{id:r.id}) }}" style="color: white;">Facture</a></button>
+                            <button class="btn btn-danger"><a href="{{ path('deleteT',{id:r.id}) }}" style="color: white;">Delete</a></button>
+                        </div>
+                    {% endif %}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+        <tfoot>
+        <tr>
+            <th>#</th>
+            <th>Transaction Type</th>
+            <th>Account</th>
+            <th>Account Recived</th>
+            <th>Date</th>
+            <th>Amount</th>
+            <th>Status</th>
+
+        </tr>
+        </tfoot>
+    </table>
+
+
+
+{% endblock %}

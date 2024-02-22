@@ -1,0 +1,21 @@
+{% extends 'clientdash/index.html.twig' %}
+{% block body %}
+    <div class="container" style="margin-left:30%;margin-top:5%">
+        <h1>Withdraw Money from Your Account</h1>
+        <div class="row">
+            <div class="col-md-6">
+                {{ form_start(form,{'attr':{'novalidate':'novalidate'}}) }}
+                {{ form_label(form.montant) }}
+                {{ form_widget(form.montant, {'attr': {'class': 'form-control'}}) }}
+                <div class="alert alert-danger">{{ form_errors(form.montant) }}</div>
+                <div style="display: none">{{ form_row(form.compteRecus, {'attr': {'class': 'form-control'}}) }}</div>
+                <span class="bg bg-warning">The Current Account balance is {{ cl.solde }}TND</span>
+                <br/>
+                <br/>
+                <button type="submit" class="btn btn-primary">withdraw</button>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

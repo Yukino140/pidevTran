@@ -1,0 +1,49 @@
+{% extends 'clientdash/index.html.twig' %}
+{% block body %}
+
+    <div class="container" style=";margin-left:50%;margin-top:10%;width:30%">
+
+        <div >
+
+            <h2>Facture n°{{ fact.id }}</h2>
+        </div>
+        <div class="invoice-details">
+            <p><strong>Account Number:</strong> {{ compte.id }}</p>
+            <p><strong>Date:</strong> {{ tranc.date|date('d-m-Y') }}</p>
+        </div>
+        <table>
+            <thead>
+            <tr>
+                <th>Transaction</th>
+                <th>Date</th>
+                <th>Montant</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            <tr>
+                <td>{{ tranc.typeTransaction.name }}</td>
+                <td>{{ tranc.date|date('d-m-Y') }}</td>
+                <td>{{ tranc.montant }}</td>
+            </tr>
+
+            </tbody>
+            <tfoot>
+            <tr>
+                <td colspan="2" class="total">Tax</td>
+                <td class="total">{{ fact.tax }}%</td>
+            </tr>
+            <tr>
+                <td colspan="2" class="total">Total</td>
+                <td class="total">{{ fact.montantTTC }}</td>
+            </tr>
+            </tfoot>
+        </table>
+        <br/>
+        <br/>
+        <button class="btn btn-primary">Export PDF</button>
+        <button class="btn btn-secondary">Export Excel</button>
+        <button class="btn btn-danger"><a href="{{ path('deleteF',{id:fact.id}) }}" style="color: white;">Delete</a></button>
+
+    </div>
+{% endblock %}

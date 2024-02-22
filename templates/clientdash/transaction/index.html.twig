@@ -1,0 +1,29 @@
+{% extends 'index.html.twig' %}
+
+{% block header %}
+    <div class="app-header-navigation">
+        <div class="tabs">
+            <a href="#">
+                Overview
+            </a>
+            <a href="{{ path('depo') }}" >
+                Deposit
+            </a>
+            <a href="{{ path('trans') }}">
+                Transfert
+            </a>
+            <a href="{{ path('retrait') }}">
+                Withdrawl
+            </a>
+            <a href="{{ path('getAllT') }}">
+                Transactions History
+            </a>
+        </div>
+    </div>
+{% endblock %}
+
+{% block body %}
+
+
+
+{% endblock %}
