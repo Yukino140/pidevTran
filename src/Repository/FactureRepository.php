@@ -34,6 +34,21 @@ class FactureRepository extends ServiceEntityRepository
         ;
     }
 
+    /**
+     * @return ?Facture Returns an array of Facture objects
+     */
+    public function findByIDTransactionOrNot($id):?Facture
+    {
+        return $this->createQueryBuilder('f')
+            ->andWhere('f.idTransaction = :val')
+            ->setParameter('val', $id)
+            ->getQuery()
+            ->getOneOrNullResult()
+            ;
+    }
+
+
+
 //    public function findOneBySomeField($value): ?Facture
 //    {
 //        return $this->createQueryBuilder('f')

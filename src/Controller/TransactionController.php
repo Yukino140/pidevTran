@@ -44,6 +44,7 @@ class TransactionController extends AbstractController
         $client=$rep->find(1);
         $transaction->setIdCompte($client);
         $transaction->setTypeTransaction(TransactionType::Versement);
+        $transaction->setCompteRecus($client->getId());
         $transaction->setDate(new \DateTime('now'));
         $form=$this->createForm(\App\Form\TransactionType::class,$transaction);
         $form->handleRequest($req);
@@ -69,11 +70,17 @@ class TransactionController extends AbstractController
         $form=$this->createForm(\App\Form\TransactionType::class,$transaction);
         $form->handleRequest($req);
         if($form->isSubmitted() && $form->isValid()){
-            $em->persist($transaction);
-            $em->flush();
-            return $this->redirectToRoute('trans');
+            if($client->getSolde()>$transaction->getMontant()){
+                $client->setSolde($client->getSolde()-$transaction->getMontant());
+                $em->persist($client);
+                $em->persist($transaction);
+                $em->flush();
+                return $this->redirectToRoute('trans');
+            }else{
+                return $this->redirectToRoute('trans',['message'=>"You don't have that amount of money to withdraw"]);
+            }
         }
-        return $this->render('clientdash/transaction/transfert.html.twig',['form'=>$form->createView()]);
+        return $this->render('clientdash/transaction/transfert.html.twig',['form'=>$form->createView(),'cl'=>$client]);
     }
     #[Route('/withdrawl' ,name:'retrait')]
     public function withdrawal(Request $req, ManagerRegistry $mg,CompteRepository $rep):Response
@@ -83,6 +90,7 @@ class TransactionController extends AbstractController
         $client=$rep->find(1);
         $transaction->setIdCompte($client);
         $transaction->setTypeTransaction(TransactionType::Retrait);
+        $transaction->setCompteRecus($client->getId());
         $transaction->setDate(new \DateTime('now'));
         $form=$this->createForm(\App\Form\TransactionType::class,$transaction);
         $form->handleRequest($req);
@@ -153,11 +161,13 @@ class TransactionController extends AbstractController
     #[Route('deleteT/{id}',name:'deleteT')]
     public function deleteT($id,TransactionRepository $repo,FactureRepository $rep,ManagerRegistry $mg):Response
     {
-        $facture=$rep->findByIDTransaction($id);
+        $facture=$rep->findByIDTransactionOrNot($id);
         $transaction=$repo->find($id);
         $em=$mg->getManager();
+        if($facture!=null){
         $em->remove($facture);
         $em->flush();
+        }
         $em->remove($transaction);
         $em->flush();
         return $this->redirectToRoute('getAllT');

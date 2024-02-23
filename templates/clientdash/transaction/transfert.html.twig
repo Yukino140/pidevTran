@@ -1,9 +1,7 @@
 {% extends 'clientdash/index.html.twig' %}
 {% block body %}
     <div class="container" style="transform:translateX(30%);margin-top:5%">
-        {% if message!=null %}
-        <div class="bg bg-danger">{{ message }}</div>
-        {% endif %}
+
         <h1>Transfert Money To Another Account</h1>
         <div class="row">
             <div class="col-md-6">
@@ -15,6 +13,9 @@
                  {{ form_label(form.compteRecus) }}
                 {{ form_widget(form.compteRecus, {'attr': {'class': 'form-control'}}) }}
                 <div class="alert alert-danger">{{ form_errors(form.compteRecus) }}</div>
+
+                <span class="bg bg-warning">The Current Account balance is {{ cl.solde }}TND</span>
+                <br/>
                 <br/>
                 <button type="submit" class="btn btn-primary">Transfert</button>
                 {{ form_end(form) }}

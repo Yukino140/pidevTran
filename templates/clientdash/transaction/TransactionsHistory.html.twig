@@ -34,9 +34,10 @@
                     {% if r.facture!=null %}
                         <div>
                             <button class="btn btn-secondary"><a href="{{ path('showF',{id:r.id}) }}" style="color: white;">Facture</a></button>
-                            <button class="btn btn-danger"><a href="{{ path('deleteT',{id:r.id}) }}" style="color: white;">Delete</a></button>
+
                         </div>
-                    {% endif %}</td>
+                    {% endif %}
+                    <button class="btn btn-danger"><a href="{{ path('deleteT',{id:r.id}) }}" style="color: white;">Delete</a></button></td>
             </tr>
         {% endfor %}
         </tbody>

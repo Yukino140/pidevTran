@@ -30,6 +30,7 @@ class Transaction
     private TransactionType|null $typeTransaction = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\NotBlank(message:"You have to put Account number to transfert the money to.")]
     #[Assert\Length(max:20,maxMessage:"The Account Number can't be longer than '{{limit}}' numbers" )]
     private ?string $compteRecus = null;
 
