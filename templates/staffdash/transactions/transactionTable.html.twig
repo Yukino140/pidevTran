@@ -1,0 +1,50 @@
+{% block body %}
+    <table id="example" class="table table-striped nowrap" >
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>Transaction Type</th>
+            <th>Account</th>
+            <th>Account Recived</th>
+            <th>Date</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for r in res %}
+            {% set id= r.id %}
+
+            <tr>
+                <td>#{{ r.id }}</td>
+                <td>{{ r.typeTransaction.name }}</td>
+                <td>{{ r.idCompte }}</td>
+                <td>{{ r.compteRecus }}</td>
+                <td>{{ r.date|date('d-m-Y') }}</td>
+                <td>{{ r.montant }}</td>
+                <td></td>
+                <td><button type="button" class="btn btn-primary " id="detail" style="margin-left: 50%"  >
+                        <a href="{{ path('detailTransac', {'id': r.id}) }}"> Details</a>
+                    </button>
+
+                </td>
+
+            </tr>
+        {% endfor %}
+        </tbody>
+        <tfoot>
+        <tr>
+            <th>#</th>
+            <th>Transaction Type</th>
+            <th>Account</th>
+            <th>Account Recived</th>
+            <th>Date</th>
+            <th>Amount</th>
+            <th>Status</th>
+
+        </tr>
+        </tfoot>
+    </table>
+
+{% endblock %}

@@ -8,12 +8,21 @@ use App\Entity\TransactionType;
 use App\Repository\CompteRepository;
 use App\Repository\FactureRepository;
 use App\Repository\TransactionRepository;
+use Couchbase\ViewResult;
 use Doctrine\Persistence\ManagerRegistry;
+use Knp\Snappy\Pdf;
+use PharIo\Manifest\Email;
+use phpDocumentor\Reflection\Types\False_;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Routing\Annotation\Route;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 
 class TransactionController extends AbstractController
 {
@@ -25,13 +34,44 @@ class TransactionController extends AbstractController
         ]);
     }
     #[Route('/getAllTransactions',name:'getAllT')]
-    public function getAll(TransactionRepository $repo,CompteRepository $rep):Response
+    public function getAll(TransactionRepository $repo,CompteRepository $rep,Request $req):Response
     {
         $client=$rep->find(1);
 
-        $res =$repo->findAll();
+        $date1=$req->get('date1');
+        $date2=$req->get('date2');
+        $sum = $repo->sumTransaction($client, $date1, $date2);
+
+
+
+        $res =$repo->findListByDate($client,$date1,$date2);
+        if($req->get('ajax')){
+            return new JsonResponse([
+                'content'=>$this->renderView('clientdash/transaction/table.html.twig',[
+                    'transac'=> $res,
+                    'date1'=>$date1,
+                    'date2'=>$date2,
+                    "sum"=>$sum,
+                    "compte"=>$client
+
+                ]),
+                'data'=>$this->renderView('clientdash/transaction/index.html.twig',[
+                'transac'=> $res,
+                'date1'=>$date1,
+                'date2'=>$date2,
+                "sum"=>$sum,
+                "compte"=>$client])
+
+            ]);
+        }
+
         return $this->render('clientdash/transaction/TransactionsHistory.html.twig',[
             'transac'=> $res,
+            "sum"=>$sum,
+            "date1"=>$date1,
+            "date2"=>$date2,
+            "compte"=>$client
+
         ]);
     }
 
@@ -77,7 +117,8 @@ class TransactionController extends AbstractController
                 $em->flush();
                 return $this->redirectToRoute('trans');
             }else{
-                return $this->redirectToRoute('trans',['message'=>"You don't have that amount of money to withdraw"]);
+                $this->addFlash('failed',"You don't have that much money to transfert");
+                return $this->redirectToRoute('trans');
             }
         }
         return $this->render('clientdash/transaction/transfert.html.twig',['form'=>$form->createView(),'cl'=>$client]);
@@ -102,7 +143,8 @@ class TransactionController extends AbstractController
             $em->flush();
                 return $this->redirectToRoute('retrait');
             }else{
-                return $this->redirectToRoute('retrait',['message'=>"You don't have that amount of money to withdraw"]);
+                $this->addFlash('failed',"You don't have that much money to withrow");
+                return $this->redirectToRoute('retrait');
             }
 
         }
@@ -111,20 +153,38 @@ class TransactionController extends AbstractController
 
 
     #[Route('/getAllTransactionsForStaff',name:'getAll')]
-    public function getAllTransactions(TransactionRepository $rep):Response
+    public function getAllTransactions(TransactionRepository $rep ,Request $req):Response
     {
-        $res=$rep->findAll();
-        return $this->render('staffdash/transactions/getAllTransactions.html.twig',[
-         'res'=>$res
-        ]);
+        $id=$req->get('id');
+
+        $res=$rep->findListById($id);
+
+        if($req->get('ajax')){
+
+            return new JsonResponse([
+                'content'=>$this->renderView('staffdash/transactions/transactionTable.html.twig',[
+                    'res'=> $res,])]);
+
+
+
     }
-   /* #[Route('/showDetails',name:'detail')]
-    public function details(TransactionRepository $rep):Response
+            return $this->render('staffdash/transactions/getAllTransactions.html.twig',[
+                'res'=>$res
+            ]);
+
+
+
+    }
+    #[Route('/showDetails/{id}',name:'detail')]
+    public function details(TransactionRepository $rep,$id,CompteRepository $crep,FactureRepository $frep):Response
     {
 
-        $res=$rep->find(15);
-        return $this->
-    }*/
+        $res=$rep->findOneById($id);
+
+
+        return $this->json(['code'=>200,'transaction'=>$res], 200, [], ['groups' => 'transaction']);
+
+    }
 
     #[Route('addFacture/{id}',name:'addF')]
     public function addFacture(Request $req, ManagerRegistry $mg,TransactionRepository $rep,$id):Response
@@ -182,5 +242,90 @@ class TransactionController extends AbstractController
         $em->flush();
         return $this->redirectToRoute('getAllT');
     }
+
+    #[Route(name:'factTotale')]
+    public function factureTotale(Request $req,TransactionRepository $rep,CompteRepository $repo): Response
+    {
+        $date1=$req->get('date1');
+        $date2=$req->get('date2');
+        $compte=$repo->find(1);
+            $res = $rep->findListByDate($compte, $date1, $date2);
+            $sum = $rep->sumTransaction($compte, $date1, $date2);
+
+
+        return $this->render('clientdash/transaction/index.html.twig',[
+                'transac'=> $res,
+                'date1'=>$date1,
+                'date2'=>$date2,
+                "sum"=>$sum,
+                "compte"=>$compte]);
+
+
+        }
+
+
+    #[Route('/mail',name:'mail')]
+    public function sendMail(Request $req){
+        if($req->get('mail')){
+            $email = (new Email())
+                ->from('domamain01@gmail.com')
+                ->to('mohamedomarfitouri@gmail.com')
+                ->subject('Transaction Facture')
+                ->html('<h1>Hello</h1>');
+
+            $dsn= 'gmail+smtp://domamain01@gmail.com:aqgpyzrrwvjcrejf@default';
+            $transport= Transport::fromDsn($dsn);
+            $mailer=new Mailer($transport);
+            $mailer->send($email);
+
+        }
+    }
+
+    #[Route('/detail/{id}',name:'detailTransac')]
+    public function detail($id,TransactionRepository $rep):Response
+    {
+        $res=$rep->find($id);
+        return $this->render('staffdash/transactions/detail.html.twig',[
+            'tran'=>$res
+        ]);
+    }
+
+    #[Route('/pdf/{id}',name:'pdf')]
+    public function pdfgenerate(Request $req,$id,FactureRepository $repo,TransactionRepository $rep,CompteRepository $re):Response
+    {
+      $pdfOption = new Options();
+      $pdfOption->set('defaultFont','Arial');
+      $pdfOption->setIsRemoteEnabled(true);
+
+      $dompdf=new Dompdf($pdfOption);
+      $context= stream_context_create([
+          'ssl' => [
+              'verify_peer'=>False,
+              'verify_peer_name'=>False,
+              'allow_self_signed'=>True
+          ]
+      ]);
+        $fact=$repo->findByIDTransaction($id);
+        $tranc=$rep->find($id);
+        $compte=$re->find($tranc->getIdCompte());
+      $dompdf->setHttpContext($context);
+      $html=$this->renderView('clientdash/transaction/tableFact.html.twig',['tranc'=>$tranc,'fact'=>$fact,'compte'=>$compte]);
+      $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4');
+        $dompdf->render();
+        $fichier='factureCompte='.$compte->getId().'.pdf';
+
+        $dompdf->stream($fichier,[
+            'Attachement'=>true
+        ]);
+        return new Response();
+    }
+
+  //  #[Route('/excel/{id}',name:'ExportExcel')]
+    //public function exportExcel(Request $req,$id,FactureRepository $repo):JsonResponse
+    //{
+
+
+    //}
 
 }

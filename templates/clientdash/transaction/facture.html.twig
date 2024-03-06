@@ -1,49 +1,49 @@
 {% extends 'clientdash/index.html.twig' %}
 {% block body %}
+    <main id="main" class="main">
 
-    <div class="container" style=";margin-left:50%;margin-top:10%;width:30%">
-
-        <div >
-
-            <h2>Facture n°{{ fact.id }}</h2>
-        </div>
-        <div class="invoice-details">
-            <p><strong>Account Number:</strong> {{ compte.id }}</p>
-            <p><strong>Date:</strong> {{ tranc.date|date('d-m-Y') }}</p>
-        </div>
-        <table>
-            <thead>
-            <tr>
-                <th>Transaction</th>
-                <th>Date</th>
-                <th>Montant</th>
-            </tr>
-            </thead>
-            <tbody>
-
-            <tr>
-                <td>{{ tranc.typeTransaction.name }}</td>
-                <td>{{ tranc.date|date('d-m-Y') }}</td>
-                <td>{{ tranc.montant }}</td>
-            </tr>
-
-            </tbody>
-            <tfoot>
-            <tr>
-                <td colspan="2" class="total">Tax</td>
-                <td class="total">{{ fact.tax }}%</td>
-            </tr>
-            <tr>
-                <td colspan="2" class="total">Total</td>
-                <td class="total">{{ fact.montantTTC }}</td>
-            </tr>
-            </tfoot>
-        </table>
-        <br/>
-        <br/>
-        <button class="btn btn-primary">Export PDF</button>
+    {% include 'clientdash/transaction/tableFact.html.twig' %}
+        <button class="btn btn-primary" id="mail" href="{{ path('mail') }}">Send Mail</button>
         <button class="btn btn-secondary">Export Excel</button>
         <button class="btn btn-danger"><a href="{{ path('deleteF',{id:fact.id}) }}" style="color: white;">Delete</a></button>
+        <button class="btn btn-success" id="pdf"><a href="{{ path('pdf',{id:tranc.id}) }}">PDF</a></button>
 
-    </div>
+    </main>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        window.onload=()=>{
+            const input=document.querySelector("#mail")
+            input.addEventListener("click",()=>{
+                const fact=document.querySelector("#facture")
+                const Params= new URLSearchParams()
+                Params.append("facture",fact.innerHTML)
+                const Url = new URL(window.location.href)
+                fetch(Url.pathname + "?" + Params.toString() + "&mail=1",{
+                    headers: {
+                        "X-Requested-With": "XMLHttpRequest"
+                    }
+                }).then(response=>{
+                    console.log(response)
+                }).catch(e =>alert(e))
+
+            })
+            const input1=document.querySelector("#mail")
+            input1.addEventListener("click",()=>{
+                const fact=document.querySelector("#facture")
+                const Params= new URLSearchParams()
+                Params.append("facture",fact.innerHTML)
+                const Url = new URL(window.location.href)
+                fetch(Url.pathname + "?" + Params.toString() ,{
+                    headers: {
+                        "X-Requested-With": "XMLHttpRequest"
+                    }
+                }).then(response=>{
+                    console.log(response)
+                }).catch(e =>alert(e))
+
+            })
+        }
+    </script>
 {% endblock %}

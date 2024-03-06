@@ -1,29 +1,55 @@
-{% extends 'index.html.twig' %}
 
-{% block header %}
-    <div class="app-header-navigation">
-        <div class="tabs">
-            <a href="#">
-                Overview
-            </a>
-            <a href="{{ path('depo') }}" >
-                Deposit
-            </a>
-            <a href="{{ path('trans') }}">
-                Transfert
-            </a>
-            <a href="{{ path('retrait') }}">
-                Withdrawl
-            </a>
-            <a href="{{ path('getAllT') }}">
-                Transactions History
-            </a>
-        </div>
-    </div>
-{% endblock %}
+
 
 {% block body %}
 
 
+        <div class="container" id="facture">
+
+            <div >
+
+                <h2>Transactions Receipt from {{ date1|date('d-m-Y') }} to {{ date2|date('d-m-Y') }}</h2>
+            </div>
+            <div class="invoice-details">
+                <p><strong>Account Number:</strong> {{ compte.id }}</p>
+
+            </div>
+            <table>
+                <thead>
+                <tr>
+                    <th>Transaction</th>
+                    <th>Receiver</th>
+                    <th>Date</th>
+                    <th>Montant</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for t in transac %}
+                <tr>
+                    <td>{{ t.typeTransaction.name }}</td>
+                    <td>{{ t.compteRecus }}</td>
+                    <td>{{ t.date|date('d-m-Y') }}</td>
+                    <td>{{ t.montant }} TND</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+                <tfoot>
+
+                <tr>
+                    <td colspan="3" class="total">Total</td>
+                    <td class="total">{{ sum }} TND</td>
+                </tr>
+                </tfoot>
+            </table>
+            <br/>
+            <br/>
+
+        </div>
+        <button class="btn btn-primary" id="mail" href="{{ path('mail') }}">Send Mail</button>
+        <button class="btn btn-secondary">Export Excel</button>
+    <button class="btn btn-secondary" id="close">Close</button>
+    </main>
+
 
 {% endblock %}
+

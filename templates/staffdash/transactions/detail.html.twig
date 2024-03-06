@@ -1,0 +1,63 @@
+{% extends 'staffdash/index.html.twig' %}
+
+{% block body %}
+
+    <main id="main" class="main">
+
+        <div class="container mt-3">
+            <h2>Transaction Details</h2>
+            <hr>
+            <div class="row">
+                <div class="col-md-6">
+                    <p><b>Transaction ID:</b> #{{ tran.id }}</p>
+                    <p><b>Date:</b> {{ tran.date|date('d-m-y') }}</p>
+                    <p><b>Transaction Type:</b> {{ tran.typeTransaction.name }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><b>Amount:</b> ${{ tran.montant }}</p>
+                    <p><b>Account:</b> {{ tran.idCompte.id }}</p>
+                    <p><b>Received Account:</b>{{ tran.compteRecus }}</p>
+                </div>
+            </div>
+            <hr>
+            {% if tran.facture!=null %}
+            <div class="row">
+                <div class="col-md-12">
+                    <h4>Receipt</h4>
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Transaction</th>
+                            <th>Date</th>
+                            <th>Montant</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+
+                        <tr>
+                            <td>{{ tran.typeTransaction.name }}</td>
+                            <td>{{ tran.date|date('d-m-Y') }}</td>
+                            <td>{{ tran.montant }}</td>
+                        </tr>
+
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                            <td colspan="2" class="total">Tax</td>
+                            <td class="total">{{ tran.facture.tax}}%</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="total">Total</td>
+                            <td class="total">{{ tran.facture.montantTTC }}</td>
+                        </tr>
+                        </tfoot>
+                    </table>
+
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+    </main>
+
+{% endblock %}

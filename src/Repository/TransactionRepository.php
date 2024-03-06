@@ -24,23 +24,61 @@ class TransactionRepository extends ServiceEntityRepository
     /**
      * @return Transaction[] Returns an array of Transaction objects
      */
-    public function findListById($id): array
+    public function findListById($id=null): array
     {
-        return $this->createQueryBuilder('t')
-            ->andWhere('t.idCompte = :val')
-            ->setParameter('val', $id)
-            ->getQuery()
-            ->getResult()
-            ;
+        $req=$this->createQueryBuilder('t');
+            if($id != null) {
+
+                $req->andWhere('t.idCompte = :val')
+                    ->setParameter('val', $id);
+                    }
+
+            return $req->getQuery()->getResult();
     }
 
-//    public function findOneBySomeField($value): ?Transaction
-//    {
-//        return $this->createQueryBuilder('t')
-//            ->andWhere('t.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    public function findListByDate($id,$date1=null,$date2=null): array
+    {
+        $query = $this->createQueryBuilder('t')
+            ->andWhere('t.idCompte = :val')
+            ->setParameter('val', $id);
+            if($date1 != null){
+                $query->andWhere('t.date > :date1')
+                    ->setParameter('date1', $date1);
+            }
+            if(($date2 !=null) ){
+                if(($date1==null)or($date2>$date1)){
+                $query->andWhere('t.date< :date2')
+                    ->setParameter('date2',$date2);
+                }
+
+            }
+
+
+
+        return $query->getQuery()->getResult();
+    }
+    public function sumTransaction($id,$date1=null,$date2=null): float
+    {
+        $query = $this->createQueryBuilder('t')
+            ->andWhere('t.idCompte = :val')
+            ->setParameter('val', $id);
+        if($date1 != null){
+            $query->andWhere('t.date > :date1')
+                ->setParameter('date1', $date1);
+        }
+        if(($date2 !=null) ){
+            if(($date1==null)or($date2>$date1)){
+                $query->andWhere('t.date< :date2')
+                    ->setParameter('date2',$date2);
+            }
+
+        }
+        $query->select('SUM(t.montant) AS total');
+
+
+
+        return $query->getQuery()->getSingleScalarResult();
+    }
+
+
 }

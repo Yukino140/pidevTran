@@ -1,0 +1,46 @@
+{% block body %}
+<div class="container" id="facture">
+
+    <div >
+
+        <h2 style="text-align: center">Facture n°{{ fact.id }}</h2>
+    </div>
+    <div class="invoice-details">
+        <p><strong>Account Number:</strong> {{ compte.id }}</p>
+        <p><strong>Received Account:</strong> {{ tranc.compteRecus }}</p>
+
+        <p><strong>Date:</strong> {{ tranc.date|date('d-m-Y') }}</p>
+    </div>
+    <table border=1 style="width: 100%">
+        <thead>
+        <tr>
+            <th scope="col">Transaction</th>
+            <th scope="col">Date</th>
+            <th scope="col">Montant</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        <tr>
+            <td>{{ tranc.typeTransaction.name }}</td>
+            <td>{{ tranc.date|date('d-m-Y') }}</td>
+            <td>{{ tranc.montant }}</td>
+        </tr>
+
+        </tbody>
+        <tfoot>
+        <tr>
+            <td colspan="2" class="total">Tax</td>
+            <td class="total">{{ fact.tax }}%</td>
+        </tr>
+        <tr>
+            <td colspan="2" class="total">Total</td>
+            <td class="total">{{ fact.montantTTC }}</td>
+        </tr>
+        </tfoot>
+    </table>
+    <br/>
+    <br/>
+
+</div>
+{% endblock %}

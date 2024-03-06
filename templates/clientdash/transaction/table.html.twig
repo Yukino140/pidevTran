@@ -1,0 +1,60 @@
+{% block body %}
+    <table id="table" class="table table-striped nowrap" >
+
+
+        <thead>
+
+        <tr>
+            <th>#</th>
+            <th>Transaction Type</th>
+            <th>Account</th>
+            <th>Account Recived</th>
+            <th>Date</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for r in transac %}
+
+
+            <tr>
+                <td>#{{ r.id }}</td>
+                <td>{{ r.typeTransaction.name }}</td>
+                <td>{{ r.idCompte }}</td>
+                <td>{{ r.compteRecus }}</td>
+                <td>{{ r.date|date('d-m-Y') }}</td>
+                <td>{{ r.montant }}</td>
+                <td></td>
+                <td>{% if r.facture==null %}
+
+                        <button class="btn btn-success"><a href="{{ path('addF',{id:r.id}) }}" style="color: white;"><i class="bi bi-file-earmark-plus"></i>
+                            </a></button>
+                    {% endif %}
+                    {% if r.facture!=null %}
+                        <button class="btn btn-secondary"><a href="{{ path('showF',{id:r.id}) }}" style="color: white;"><i class="bi bi-receipt"></i>
+                            </a></button>
+
+                    {% endif %}
+                    <button class="btn btn-danger"><a href="{{ path('deleteT',{id:r.id}) }}" style="color: white;"><i class="bi bi-trash"></i>
+                        </a></button></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+        <tfoot>
+        <tr>
+            <th>#</th>
+            <th>Transaction Type</th>
+            <th>Account</th>
+            <th>Account Recived</th>
+            <th>Date</th>
+            <th>Amount</th>
+            <th>Status</th>
+
+
+        </tr>
+        </tfoot>
+
+    </table>
+{% endblock %}
